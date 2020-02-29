@@ -244,6 +244,11 @@ class HomePageScreenState extends State<HomePageScreen> {
         _disconect();
         break;
       case CustomPopupMenuVariable.reConnected:
+        setState(() {
+          _statusLable = StatusLable(Colors.yellowAccent, "Подключение",
+              StatusLabelIcon.progresIndicator);
+          _choices = _getVariableChousePopup(_statusLable.isLabelStatus);
+        });
         _connectToDevice();
         break;
     }
