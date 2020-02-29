@@ -30,86 +30,134 @@ class HomePageScreenState extends State<HomePageScreen> {
     _choices = _getVariableChousePopup(_statusLable.isLabelStatus);
   }
 
+  double opacityAnimation = 0;
+  double padingAnimation = 80;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          _choices != null
-              ? PopupMenuButton<CustomPopupMenu>(
-                  color: Colors.white,
-                  offset: Offset(0, 30),
-                  onSelected: _onSelectedPopupMenu,
-                  itemBuilder: (BuildContext context) {
-                    return _choices.map((CustomPopupMenu choice) {
-                      return PopupMenuItem<CustomPopupMenu>(
-                          value: choice,
-                          child: Container(
-                            child: Row(
-                              children: <Widget>[
-                                Text(choice.title),
-                                Icon(
-                                  choice.icon,
-                                  color: Colors.black,
-                                ),
-                              ],
-                            ),
-                          ));
-                    }).toList();
-                  },
-                )
-              : Container(),
-        ],
-        backgroundColor: Color(0xFF364fa7),
-        title: Text("Главная"),
-      ),
-      backgroundColor: Color(0xFF4f69c6),
-      body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          color: Color(0xFF5a6fba),
-          width: double.infinity,
-          height: 50,
-          child: Flex(
-            direction: Axis.horizontal,
-            children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: Text(
-                  "Статус подключения:",
-                  style: TextStyle(
+        appBar: AppBar(
+          actions: <Widget>[
+            _choices != null
+                ? PopupMenuButton<CustomPopupMenu>(
                     color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                    offset: Offset(0, 30),
+                    onSelected: _onSelectedPopupMenu,
+                    itemBuilder: (BuildContext context) {
+                      return _choices.map((CustomPopupMenu choice) {
+                        return PopupMenuItem<CustomPopupMenu>(
+                            value: choice,
+                            child: Container(
+                              child: Row(
+                                children: <Widget>[
+                                  Text(choice.title),
+                                  Icon(
+                                    choice.icon,
+                                    color: Colors.black,
+                                  ),
+                                ],
+                              ),
+                            ));
+                      }).toList();
+                    },
+                  )
+                : Container(),
+          ],
+          backgroundColor: Color(0xFF364fa7),
+          title: Text("Главная"),
+        ),
+        backgroundColor: Color(0xFF4f69c6),
+        body: Column(
+          children: <Widget>[
+            _getConnectionHeader(),
+            Padding(padding: EdgeInsets.symmetric(vertical: 20)),
+            _getBody(),
+          ],
+        ));
+  }
+
+  Widget _getConnectionHeader() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      color: Color(0xFF5a6fba),
+      width: double.infinity,
+      height: 50,
+      child: Flex(
+        direction: Axis.horizontal,
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Text(
+              "Статус подключения:",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
               ),
-              Expanded(
-                flex: 1,
-                child: Text(
-                  _statusLable.lable,
-                  style: TextStyle(
-                    color: _statusLable.colorLable,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.end,
-                ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              _statusLable.lable,
+              style: TextStyle(
+                color: _statusLable.colorLable,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-              ),
-              Expanded(
-                flex: 0,
-                child: Container(
-                  height: 20,
-                  width: 20,
-                  child: _getIconOnStatus(_statusLable.isLabelStatus),
-                ),
-              ),
-            ],
-          )),
+              textAlign: TextAlign.end,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 5),
+          ),
+          Expanded(
+            flex: 0,
+            child: Container(
+              height: 20,
+              width: 20,
+              child: _getIconOnStatus(_statusLable.isLabelStatus),
+            ),
+          ),
+        ],
+      ),
     );
   }
+
+  void _setAnimation(bool isShow) {
+    if (isShow) {
+      setState(() {
+        padingAnimation = 0;
+        opacityAnimation = 1.0;
+      });
+    } else {
+      padingAnimation = 80;
+      opacityAnimation = 0;
+    }
+  }
+
+  Widget _getBody() {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 1000),
+      curve: Curves.easeOutQuint,
+      color: Colors.transparent,
+      padding: EdgeInsets.only(top: padingAnimation),
+      child: AnimatedOpacity(
+        opacity: opacityAnimation,
+        duration: Duration(milliseconds: 1000),
+        curve: Curves.easeOutQuint,
+        child: Text(
+          "Выбор цвета подстветки салона",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  //********************LOGIC code */
 
   Widget _getIconOnStatus(StatusLabelIcon status) {
     switch (status) {
@@ -174,6 +222,7 @@ class HomePageScreenState extends State<HomePageScreen> {
             Colors.redAccent, "Отключено", StatusLabelIcon.disconection);
         _choices = _getVariableChousePopup(_statusLable.isLabelStatus);
       });
+      _setAnimation(false);
     } catch (e) {}
   }
 
@@ -186,12 +235,14 @@ class HomePageScreenState extends State<HomePageScreen> {
             Colors.greenAccent, "Подключено", StatusLabelIcon.connection);
         _choices = _getVariableChousePopup(_statusLable.isLabelStatus);
       });
+      _setAnimation(true);
     } catch (e) {
       setState(() {
         _statusLable = StatusLable(
             Colors.redAccent, "Отключено", StatusLabelIcon.disconection);
         _choices = _getVariableChousePopup(_statusLable.isLabelStatus);
       });
+      _setAnimation(false);
     }
   }
 
