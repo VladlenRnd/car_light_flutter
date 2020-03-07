@@ -70,7 +70,7 @@ class HomePageScreenState extends State<HomePageScreen> {
         body: Column(
           children: <Widget>[
             _getConnectionHeader(),
-            Padding(padding: EdgeInsets.symmetric(vertical: 20)),
+            Padding(padding: EdgeInsets.symmetric(vertical: 10)),
             _getBody(),
           ],
         ));
@@ -131,7 +131,7 @@ class HomePageScreenState extends State<HomePageScreen> {
         opacityAnimation = 1.0;
       });
     } else {
-      padingAnimation = 80;
+      padingAnimation = 40;
       opacityAnimation = 0;
     }
   }
@@ -143,16 +143,101 @@ class HomePageScreenState extends State<HomePageScreen> {
       color: Colors.transparent,
       padding: EdgeInsets.only(top: padingAnimation),
       child: AnimatedOpacity(
-        opacity: opacityAnimation,
-        duration: Duration(milliseconds: 1000),
-        curve: Curves.easeOutQuint,
-        child: Text(
-          "Выбор цвета подстветки салона",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
+          opacity: opacityAnimation,
+          duration: Duration(milliseconds: 1000),
+          curve: Curves.easeOutQuint,
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                child: Flex(
+                  direction: Axis.horizontal,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        "Выбор цвета подстветки салона",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 0,
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border.all(color: Colors.black87, width: 2),
+                          borderRadius: BorderRadius.all(Radius.circular(25)),
+                        ),
+                        child: Material(
+                          color: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          child: InkWell(
+                            onTap: () {},
+                            borderRadius: BorderRadius.all(Radius.circular(25)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30),
+              ),
+              Stack(
+                children: <Widget>[
+                  Image.asset(
+                    "assets/icon/car.png",
+                    fit: BoxFit.fill,
+                    height: 400,
+                  ),
+                  Positioned(
+                    top: 148,
+                    left: 120,
+                    width: 40,
+                    child: _getColorsContainer(Colors.red),
+                  ),
+                  Positioned(
+                    top: 158,
+                    left: 48,
+                    width: 40,
+                    child: _getColorsContainer(Colors.red),
+                  ),
+                  Image.asset(
+                    "assets/icon/carAlpha.png",
+                    fit: BoxFit.fill,
+                    height: 400,
+                  ),
+                ],
+              )
+            ],
+          )),
+    );
+  }
+
+  Widget _getColorsContainer(Color color) {
+    return Container(
+      height: 5,
+      width: 5,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: color,
+            blurRadius: 20.0, // has the effect of softening the shadow
+            spreadRadius: 6.0, // has the effect of extending the shadow
+            offset: Offset(
+              0.0, // horizontal, move right 10
+              0.0, // vertical, move down 10
+            ),
+          )
+        ],
       ),
     );
   }
