@@ -14,8 +14,10 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class HomePageScreenState extends State<HomePageScreen> {
-  Color pickerColor = Color(0xff443a49);
-  Color currentColor = Color(0xff443a49);
+  Color pickerColor = Color(0xFFFF0000);
+  Color currentColor = Color(0xFFFF0000);
+
+  Color setColorCar = Color(0xFFFF0000);
   List<CustomPopupMenu> _choices;
 
   BluetoothConnection connection;
@@ -31,7 +33,7 @@ class HomePageScreenState extends State<HomePageScreen> {
   }
 
   double opacityAnimation = 0;
-  double padingAnimation = 80;
+  double padingAnimation = 40;
 
   @override
   Widget build(BuildContext context) {
@@ -174,12 +176,14 @@ class HomePageScreenState extends State<HomePageScreen> {
                           borderRadius: BorderRadius.all(Radius.circular(25)),
                         ),
                         child: Material(
-                          color: Colors.red,
+                          color: setColorCar,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25.0),
                           ),
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              _pressButtonSetColor();
+                            },
                             borderRadius: BorderRadius.all(Radius.circular(25)),
                           ),
                         ),
@@ -202,13 +206,13 @@ class HomePageScreenState extends State<HomePageScreen> {
                     top: 148,
                     left: 120,
                     width: 40,
-                    child: _getColorsContainer(Colors.red),
+                    child: _getColorsContainer(setColorCar),
                   ),
                   Positioned(
                     top: 158,
                     left: 48,
                     width: 40,
-                    child: _getColorsContainer(Colors.red),
+                    child: _getColorsContainer(setColorCar),
                   ),
                   Image.asset(
                     "assets/icon/carAlpha.png",
@@ -242,7 +246,58 @@ class HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
+  void _pressButtonSetColor() async {
+    await _showDialogColor(context);
+  }
+
+  Future _showDialogColor(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: pickerColor,
+              onColorChanged: changeColor,
+              showLabel: false,
+              pickerAreaHeightPercent: 0.8,
+              displayThumbColor: false,
+              enableAlpha: false,
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Отмена'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Выбрать цвет'),
+              onPressed: () {
+                _setColor();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   //********************LOGIC code */
+
+  void _setColor() {
+    setState(() {
+      setColorCar = currentColor;
+    });
+
+    _sendMessage(_getDataAllColorChange(setColorCar));
+  }
+
+  String _getDataAllColorChange(Color color) {
+    return "0,${color.red},${color.green},${color.blue}";
+  }
 
   Widget _getIconOnStatus(StatusLabelIcon status) {
     switch (status) {
@@ -331,42 +386,12 @@ class HomePageScreenState extends State<HomePageScreen> {
     }
   }
 
-  void sendMessage() async {
-    Uint8List data = ascii.encode("1");
-    connection.output.add(data);
+  //**********************SendData
+
+  void _sendMessage(String data) async {
+    Uint8List dataUint = ascii.encode(data);
+    connection.output.add(dataUint);
     //connection.input.listen(onData)
-  }
-
-  void pressButton() async {
-    await showDialogColor(context);
-  }
-
-  Future showDialogColor(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: pickerColor,
-              onColorChanged: changeColor,
-              showLabel: false,
-              pickerAreaHeightPercent: 0.8,
-              displayThumbColor: false,
-              enableAlpha: false,
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Regret'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void changeColor(Color color) {
